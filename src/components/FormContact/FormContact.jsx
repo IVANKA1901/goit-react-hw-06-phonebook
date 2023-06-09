@@ -1,16 +1,29 @@
 // import PropTypes from 'prop-types';
+import { Notify } from 'notiflix';
 import { useState } from 'react';
 import { nanoid } from 'nanoid';
 import css from './FormContact.module.css';
-import { useDispatch } from 'react-redux';
-import { addContactAction } from 'store/actions';
+import { useDispatch, useSelector } from 'react-redux';
+import { addContact } from 'store/contactsSlice';
+import { getContacts } from 'store/selectors';
 
 export function FormContacts() {
   const [name, setName] = useState('');
   const [number, setNumber] = useState('');
-  const [id, setId] = useState(nanoid());
+  const [setId] = useState(nanoid());
 
   const dispatch = useDispatch();
+  const contacts = useSelector(getContacts);
+
+  const uniqueName = newName => {
+    const searchUnique = newName.toLowerCase();
+
+    if (contacts.find(({ name }) => name.toLowerCase() === searchUnique)) {
+      Notify.failure(`"${newName}" is already in contacts`);
+      return false;
+    }
+    return true;
+  };
 
   const handleChange = e => {
     const { name, value } = e.target;
@@ -30,14 +43,15 @@ export function FormContacts() {
   const handleSubmit = e => {
     e.preventDefault();
 
-    dispatch(
-      addContactAction({
-        name: name,
-        number: number,
-        id: nanoid(),
-      })
-    );
-
+    if (uniqueName(name)) {
+      dispatch(
+        addContact({
+          name: name,
+          number: number,
+          id: nanoid(),
+        })
+      );
+    }
     setName('');
     setNumber('');
     setId(nanoid());
