@@ -1,12 +1,16 @@
-import PropTypes from 'prop-types';
+// import PropTypes from 'prop-types';
 import { useState } from 'react';
 import { nanoid } from 'nanoid';
 import css from './FormContact.module.css';
+import { useDispatch } from 'react-redux';
+import { addContactAction } from 'store/actions';
 
-export function FormContacts({ onSubmit }) {
+export function FormContacts() {
   const [name, setName] = useState('');
   const [number, setNumber] = useState('');
-  const [setId] = useState(nanoid());
+  const [id, setId] = useState(nanoid());
+
+  const dispatch = useDispatch();
 
   const handleChange = e => {
     const { name, value } = e.target;
@@ -26,7 +30,13 @@ export function FormContacts({ onSubmit }) {
   const handleSubmit = e => {
     e.preventDefault();
 
-    onSubmit({ name, number, id: nanoid() });
+    dispatch(
+      addContactAction({
+        name: name,
+        number: number,
+        id: nanoid(),
+      })
+    );
 
     setName('');
     setNumber('');
@@ -70,6 +80,6 @@ export function FormContacts({ onSubmit }) {
   );
 }
 
-FormContacts.propTypes = {
-  onSubmit: PropTypes.func.isRequired,
-};
+// FormContacts.propTypes = {
+//   onSubmit: PropTypes.func.isRequired,
+// };
